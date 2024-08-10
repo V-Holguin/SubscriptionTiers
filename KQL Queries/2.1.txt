@@ -1,0 +1,103 @@
+// Find top 5 items purchased by subscription tier
+Orders
+| extend NormalizedStatus = case(
+    ["Customer Status"] == "Silver" or ["Customer Status"] == "SILVER", "Silver",
+    ["Customer Status"] == "Gold" or ["Customer Status"] == "GOLD", "Gold",
+    ["Customer Status"] == "Platinum" or ["Customer Status"] == "PLATINUM", "Platinum",
+    "Unknown"  // default case
+)
+| summarize ProductCount = count() by NormalizedStatus, ["Product ID"]
+| partition by NormalizedStatus
+(
+    order by ProductCount desc
+    | top 5 by ProductCount
+)
+
+// Gives us the ProductIDs ofthe top items of each tier
+-------------------------------------------------------------------------------------------------------------------
+
+// Check that the Supplier table contains all our ProductIDs
+let SilverTierProducts = datatable(["Product ID"]: string)
+[
+    "240100300006", "240100200012", "230100500082", "230100700011", "230100700002"
+];
+let GoldTierProducts = datatable(["Product ID"]: string)
+[
+    "220200100099", "230100700011", "230100700002", "240100200012", "240100300006"
+];
+let PlatinumTierProducts = datatable(["Product ID"]: string)
+[
+    "240100200012", "240100200002", "240100300006", "230100700002", "230100700008"
+];
+let AllProducts = union SilverTierProducts, GoldTierProducts, PlatinumTierProducts;
+let ExistingProducts = Supplier
+| where ["Product ID"] in (AllProducts)
+| summarize by ["Product ID"];
+let MissingProducts = AllProducts
+| where ["Product ID"] !in (ExistingProducts)
+| summarize MissingProductIDs = make_list(["Product ID"]);
+MissingProducts
+
+// Returns an empty list, which means all the product IDs are present
+-------------------------------------------------------------------------------------------------------------------
+
+// Using our ProductIDs, show a table with the product names as well as how many times the product was purchased by subscription tier
+.create table TopItemSilverOrders (
+    ["Product ID"]: long,
+    ["OrderCount"]: long
+)
+
+.append TopItemSilverOrders <|
+    table("Orders")
+    | where ["Customer Status"] == "Silver" or ["Customer Status"] == "SILVER"
+    | where ["Product ID"] in ("240100300006", "240100200012", "230100500082", "230100700011", "230100700002")
+    | summarize OrderCount = count() by ["Product ID"];
+
+Supplier
+| join kind=inner TopItemSilverOrders on ["Product ID"]
+
+// 3/5 items were in the Outdoors product line, 2/5 from Sports
+// The 2 Sports products account for 46.24% of the sales in the top 5 products
+// Rank 1 Pentanque Balls sold 515 units, 100 more than rank 2 Darts
+// Outdoor gear consists of 2 tents and rain pants
+// Combining the tent sales, gives 718 tents sold, which would take first place if grouped
+-------------------------------------------------------------------------------------------------------------------
+
+// Do the same for Gold
+.create table TopItemGoldOrders (
+    ["Product ID"]: long,
+    ["OrderCount"]: long
+)
+
+.append TopItemGoldOrders <|
+    table("Orders")
+    | where ["Customer Status"] == "Gold" or ["Customer Status"] == "GOLD"
+    | where ["Product ID"] in ("220200100099", "230100700011", "230100700002", "240100200012", "240100300006")
+    | summarize OrderCount = count() by ["Product ID"];
+
+Supplier
+| join kind=inner TopItemGoldOrders on ["Product ID"]
+
+// Similar trend, same top 2 items
+// Here third place is tennis shoes from category "Clothes"
+// That is followed by the same two tents
+-------------------------------------------------------------------------------------------------------------------
+
+// And for Platinum
+.create table TopItemPlatinumOrders (
+    ["Product ID"]: long,
+    ["OrderCount"]: long
+)
+
+.append TopItemPlatinumOrders <|
+    table("Orders")
+    | where ["Customer Status"] == "Platinum" or ["Customer Status"] == "PLATINUM"
+    | where ["Product ID"] in ("240100200012", "240100200002", "240100300006", "230100700002", "230100700008")
+    | summarize OrderCount = count() by ["Product ID"];
+
+Supplier
+| join kind=inner TopItemPlatinumOrders on ["Product ID"]
+
+// Tents take the lead here for the top 2 products, however the hurricane tent seen in Silver and Gold is not present, instead the top seller by a wide margin is a "Family Holiday" tent
+// Next 2 items are the Petanque Balls and Darts, followed by another set of Darts
+-------------------------------------------------------------------------------------------------------------------
