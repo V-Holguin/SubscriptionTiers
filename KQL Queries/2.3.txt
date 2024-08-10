@@ -1,0 +1,35 @@
+// Check the order total of repeat customers
+.create table CustomerOrdersWithPrices (
+    ["Customer ID"]: long,
+    ["Customer Status"]: string,
+    ["OrderCount"]: long,
+    ["Total Retail Price for This Order"]: real
+    )
+
+.append CustomerOrdersWithPrices <|
+    table("Orders")
+    | project ["Customer Status"], ["Customer ID"], ["Total Retail Price for This Order"]
+    | summarize 
+        OrderCount = count(), 
+        AvgRetailPrice = avg(["Total Retail Price for This Order"]) 
+        by ["Customer ID"], ["Customer Status"]
+
+CustomerOrdersWithPrices
+| extend NormalizedStatus = case(
+    ["Customer Status"] == "Silver" or ["Customer Status"] == "SILVER", "Silver",
+    ["Customer Status"] == "Gold" or ["Customer Status"] == "GOLD", "Gold",
+    ["Customer Status"] == "Platinum" or ["Customer Status"] == "PLATINUM", "Platinum",
+    ["Customer Status"]
+)
+| extend IsRepeatCustomer = iff(OrderCount > 2, "Repeat", "NonRepeat")
+| summarize 
+    UniqueCustomers = dcount(["Customer ID"]),
+    RepeatCustomers = dcountif(["Customer ID"], IsRepeatCustomer == "Repeat"),
+    AvgRetailPriceForRepeat = avgif(["Total Retail Price for This Order"], IsRepeatCustomer == "Repeat"),
+    AvgRetailPriceForNonRepeat = avgif(["Total Retail Price for This Order"], IsRepeatCustomer == "NonRepeat")
+    by NormalizedStatus
+
+// Silver non repeat: $140.87, Silver repeat: $138.20 (1.9% Drop)
+// Gold non repeat: $138.90, Gold repeat: $136.82 (1.5% Drop)
+// Platinum non repeat: $139.91, Platinum repeat: $120.01 (14.2% Drop)
+// Consider this carefully as 7.07% of customers are Platinum and 0.08% of those are repeat customers.
