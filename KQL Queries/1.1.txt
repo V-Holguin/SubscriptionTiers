@@ -1,0 +1,59 @@
+// Check fields for NULLs
+Orders
+| summarize 
+    Null_CustomerID = countif(isnull("Customer ID")),
+    Null_CustomerStatus = countif(isnull("Customer Status")),
+    Null_DateOrderWasPlaced = countif(isnull(["Date Order was placed"])),
+    Null_DeliveryDate = countif(isnull(["Delivery Date"])),
+    Null_ProductID = countif(isnull("Product ID")),
+    Null_QuantityOrdered = countif(isnull(["Quantity Ordered"])),
+    Null_TotalRetailPrice = countif(isnull(["Total Retail Price for This Order"])),
+    Null_CostPricePerUnit = countif(isnull(["Cost Price Per Unit"]))
+------------------------------------------------------------------------------------------------------------------------
+// Check columns that had 1 NULL value
+Orders
+    | where isnull(["Quantity Ordered"]) or isnull(["Total Retail Price for This Order"]) or isnull(["Cost Price Per Unit"])
+------------------------------------------------------------------------------------------------------------------------
+// Refine original query to account for empty strings
+Orders
+            | summarize 
+                Null_CustomerID = countif(isnull(["Customer ID"])),
+                NullOrEmpty_CustomerStatus = countif(isnull(["Customer Status"]) or trim(' ', ["Customer Status"]) == ''),
+                Null_DateOrderWasPlaced = countif(isnull(["Date Order was placed"])),
+                Null_DeliveryDate = countif(isnull(["Delivery Date"])),
+                Null_ProductID = countif(isnull(["Product ID"])),
+                Null_QuantityOrdered = countif(isnull(["Quantity Ordered"])),
+                Null_TotalRetailPrice = countif(isnull(["Total Retail Price for This Order"])),
+                Null_CostPricePerUnit = countif(isnull(["Cost Price Per Unit"])),
+                Null_OrderID = countif(isnull(["Order ID"]))
+------------------------------------------------------------------------------------------------------------------------
+// Check for 0 where it shouldn't be
+Orders
+| where ["Quantity Ordered"] == 0 or ["Total Retail Price for This Order"] == 0 or ["Cost Price Per Unit"] == 0
+------------------------------------------------------------------------------------------------------------------------
+// Check duplicates
+Orders
+| summarize Count = count() by 
+    CustomerID = ["Customer ID"],
+    CustomerStatus = ["Customer Status"], 
+    DateOrderWasPlaced = ["Date Order was placed"], 
+    DeliveryDate = ["Delivery Date"], 
+    OrderID = ["Order ID"],
+    ProductID = ["Product ID"],
+    QuantityOrdered = ["Quantity Ordered"],
+    TotalRetailPrice = ["Total Retail Price for This Order"],
+    CostPricePerUnit = ["Cost Price Per Unit"]
+| where Count > 1;
+------------------------------------------------------------------------------------------------------------------------
+// Check outliers
+let stats = Orders
+| summarize 
+    Mean = avg(["Quantity Ordered"]),
+    StdDev = stdev(["Quantity Ordered"]);
+let MeanValue = toscalar(stats | project Mean);
+let StdDevValue = toscalar(stats | project StdDev);
+Orders
+| extend Mean = MeanValue, StdDev = StdDevValue
+| extend IsOutlier = abs(["Quantity Ordered"] - Mean) > 2 * StdDev
+| where IsOutlier
+------------------------------------------------------------------------------------------------------------------------
