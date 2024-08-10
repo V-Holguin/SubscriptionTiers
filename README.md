@@ -28,4 +28,14 @@ in order to provide actionable insights that can be used to drive more Platinum 
   - If memberships are priced too far apart, the value gained from a higher membership may be offset by the price creating a barrier to entry, which can keep customers from upgrading their tier.
 
 ## Step 4: Diving Deeper into Customer Behavior Using KQL
+- Grabbed the top 5 most purchased ProductIDs based on subscription tier.
+- Grabbed a table that showed the product names and count of purchases for the products based on subscription tier.
+  - Silver showed top item was Petanque Balls, followed by Darts, 2 tents, then rain pants
+    - The two tents account for 46.24% of sales within the top 5 items of Silver when grouped together
+  - Gold showed similar results with Petanque Balls followed by Darts.
+    - Here we have tennis shoes coming in at 3rd followed by the same two tents from before.
+  - Platinum showed similar category results with a slight difference.
+    - Top 2 items were tents this time with the top seller being a "Family Holiday" tent. The "Hurricane" tent seen in Silver and Gold is not present in the top 5, while Silver and Gold didn't show a "Family Holiday" tent in their results.
+    - Pentanque Balls and 2 sets of Darts construct the other 3 results.
+    - This can imply Platinum members are shopping for their family while Silver and Gold members are individual shoppers, but lets dig deeper.
 - 
