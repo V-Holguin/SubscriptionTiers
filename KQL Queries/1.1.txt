@@ -12,20 +12,20 @@ Orders
 ------------------------------------------------------------------------------------------------------------------------
 // Check columns that had 1 NULL value
 Orders
-    | where isnull(["Quantity Ordered"]) or isnull(["Total Retail Price for This Order"]) or isnull(["Cost Price Per Unit"])
+| where isnull(["Quantity Ordered"]) or isnull(["Total Retail Price for This Order"]) or isnull(["Cost Price Per Unit"])
 ------------------------------------------------------------------------------------------------------------------------
 // Refine original query to account for empty strings
 Orders
-            | summarize 
-                Null_CustomerID = countif(isnull(["Customer ID"])),
-                NullOrEmpty_CustomerStatus = countif(isnull(["Customer Status"]) or trim(' ', ["Customer Status"]) == ''),
-                Null_DateOrderWasPlaced = countif(isnull(["Date Order was placed"])),
-                Null_DeliveryDate = countif(isnull(["Delivery Date"])),
-                Null_ProductID = countif(isnull(["Product ID"])),
-                Null_QuantityOrdered = countif(isnull(["Quantity Ordered"])),
-                Null_TotalRetailPrice = countif(isnull(["Total Retail Price for This Order"])),
-                Null_CostPricePerUnit = countif(isnull(["Cost Price Per Unit"])),
-                Null_OrderID = countif(isnull(["Order ID"]))
+| summarize 
+     Null_CustomerID = countif(isnull(["Customer ID"])),
+     NullOrEmpty_CustomerStatus = countif(isnull(["Customer Status"]) or trim(' ', ["Customer Status"]) == ''),
+     Null_DateOrderWasPlaced = countif(isnull(["Date Order was placed"])),
+     Null_DeliveryDate = countif(isnull(["Delivery Date"])),
+     Null_ProductID = countif(isnull(["Product ID"])),
+     Null_QuantityOrdered = countif(isnull(["Quantity Ordered"])),
+     Null_TotalRetailPrice = countif(isnull(["Total Retail Price for This Order"])),
+     Null_CostPricePerUnit = countif(isnull(["Cost Price Per Unit"])),
+     Null_OrderID = countif(isnull(["Order ID"]))
 ------------------------------------------------------------------------------------------------------------------------
 // Check for 0 where it shouldn't be
 Orders
