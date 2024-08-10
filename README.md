@@ -64,4 +64,4 @@ in order to provide actionable insights that can be used to drive more Platinum 
   - An additional promotion idea could be increased savings on Sports items for Platinum members. This should help bring more customers that shop for personal items rather than just from shoppers in the Family category.
 
 ## Step 6: Construct a Report that Outlines Findings Using Microsoft Word
-- Seen [here.]()
+- Seen [here.](https://github.com/V-Holguin/SubscriptionTiers/blob/main/SubscriptionTiersReport.docx)
