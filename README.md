@@ -48,7 +48,7 @@ in order to provide actionable insights that can be used to drive more Platinum 
   - Silver non repeat: $140.87, Silver repeat: $138.20 (1.9% Drop)
   - Gold non repeat: $138.90, Gold repeat: $136.82 (1.5% Drop)
   - Platinum non repeat: $139.91, Platinum repeat: $120.01 (14.2% Drop)
-  - There is a significant difference in order total but we need to keep in my that Platinum members make up 7.07% of customers and of that, 0.08% of them are repeat customers so we are looking at a small sample
+  - There is a significant difference in order total but we need to keep in mind that Platinum members make up 7.07% of customers and of that, 0.08% of them are repeat customers so we are looking at a small sample
 - Lastly, I investigated which items repeat customers were buying grouped by their subscription tier [here.](https://github.com/V-Holguin/SubscriptionTiers/blob/main/KQL%20Queries/2.4.txt)
   - Silver showed no difference between repeat and non-repeat customers.
   - Gold had similar results.
