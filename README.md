@@ -29,7 +29,7 @@ in order to provide actionable insights that can be used to drive more Platinum 
 
 ## Step 4: Diving Deeper into Customer Behavior Using KQL
 - Grabbed the top 5 most purchased ProductIDs based on subscription tier.
-- Grabbed a table that showed the product names and count of purchases for the products based on subscription tier.
+- Grabbed a table that showed the product names and count of purchases for the products based on subscription tier seen [here.](https://github.com/V-Holguin/SubscriptionTiers/blob/main/KQL%20Queries/2.1.txt)
   - Silver showed top item was Petanque Balls, followed by Darts, 2 tents, then rain pants
     - The two tents account for 46.24% of sales within the top 5 items of Silver when grouped together
   - Gold showed similar results with Petanque Balls followed by Darts.
@@ -38,4 +38,15 @@ in order to provide actionable insights that can be used to drive more Platinum 
     - Top 2 items were tents this time with the top seller being a "Family Holiday" tent. The "Hurricane" tent seen in Silver and Gold is not present in the top 5, while Silver and Gold didn't show a "Family Holiday" tent in their results.
     - Pentanque Balls and 2 sets of Darts construct the other 3 results.
     - This can imply Platinum members are shopping for their family while Silver and Gold members are individual shoppers, but lets dig deeper.
+- Checked regular customers by subscription type by defining a regular customer as one that has at least 3 purchases [here.](https://github.com/V-Holguin/SubscriptionTiers/blob/main/KQL%20Queries/2.2.txt)
+  - We have 9,014 Silver, 8,338 Gold, and 3 Platinum regular customers.
+  - And 43,603 Silver, 43,453 Gold, and 3,974 Platinum unique customers.
+  - Which means 20.7% of Silver customers are reapeat customers. 19.2% of Gold are reapeat. 0.08% of Platinum are repeat.
+  - Rate of repeat customers that are Platinum members is dramatically low.
+  - We now know Platinum members shop for their family and are not repeat customers.
+- Investigated regular customers more by looking at their order totals [here.](https://github.com/V-Holguin/SubscriptionTiers/blob/main/KQL%20Queries/2.3.txt)
+  - Silver non repeat: $140.87, Silver repeat: $138.20 (1.9% Drop)
+  - Gold non repeat: $138.90, Gold repeat: $136.82 (1.5% Drop)
+  - Platinum non repeat: $139.91, Platinum repeat: $120.01 (14.2% Drop)
+  - There is a significant difference in order total but we need to keep in my that Platinum members make up 7.07% of customers and of that, 0.08% of them are repeat customers so we are looking at a small sample
 - 
