@@ -1,0 +1,14 @@
+// Exploring unique customers and products
+Orders
+| summarize UniqueCustomerCount = count_distinct(["Customer ID"]), UniqueProductCount = count_distinct(["Product ID"])
+
+// We have 56,028 unique customers and 3,125 unique products
+-------------------------------------------------------------------------------------------------------------------------------------
+
+// Exploring the customers with the most orders
+Orders
+| summarize OrderCount = count() by ["Customer ID"]
+| where OrderCount > 21
+
+// The customer with the highest amount of orders had 26 orders over the 5 years
+// This doesn't look that unusual since 21 people have 20 or more orders in that time period
