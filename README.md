@@ -57,4 +57,10 @@ in order to provide actionable insights that can be used to drive more Platinum 
     - This can mean regular Platinum customers shop for clothing, but again this is a very small sample.
 
 ## Step 5: Conclusions and Specified Recommendations
-- 
+- In addition to the ideas to drive Platinum subscriptions outlined earlier, we now have seen 0.08% of Platinum members are regular customers.
+  - A more specified promotion may be a "Buy More, Save More" type deal that targets Platinum members. This could push the population of regular customers towards a Platinum membership, since they seem to avoid it currently.
+  - This also supports the idea of reviewing pricing and perk differences between tiers.
+    - For the percentage of Platinum members being repeat customers to be that low, there must be a better value in Silver and Gold memberships over Platinum when it comes to repeat purchases, which is why these customers won't sign up for Platinum.
+
+## Step 6: Construct a Report that Outlines Findings Using Microsoft Word
+- Seen [here.]()
