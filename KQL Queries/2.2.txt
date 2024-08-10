@@ -1,0 +1,28 @@
+// Find customers that have at least 3 orders grouped by tier
+.create table CustomerOrderCounts (
+    ["Customer ID"]: long,
+    ["Customer Status"]: string,
+    ["OrderCount"]: long
+    )
+
+.append CustomerOrderCounts <|
+    table("Orders")
+    | project ["Customer Status"], ["Customer ID"]
+    | summarize OrderCount = count() by ["Customer ID"], ["Customer Status"];
+
+
+CustomerOrderCounts
+| extend NormalizedStatus = case(
+    ["Customer Status"] == "Silver" or ["Customer Status"] == "SILVER", "Silver",
+    ["Customer Status"] == "Gold" or ["Customer Status"] == "GOLD", "Gold",
+    ["Customer Status"] == "Platinum" or ["Customer Status"] == "PLATINUM", "Platinum",
+    ["Customer Status"]
+)
+| summarize UniqueCustomers = dcount(["Customer ID"]),
+            RepeatCustomers = dcountif(["Customer ID"], OrderCount > 2) 
+            by NormalizedStatus
+
+// We have 9,014 Silver, 8,338 Gold, and 3 Platinum regular customers.
+// And 43,603 Silver, 43,453 Gold, and 3,974 Platinum unique customers.
+// Which means 20.7% of Silver customers are reapeat customers. 19.2% of Gold are reapeat. 0.08% of Platinum are repeat.
+// Rate of repeat customers that are Platinum members is dramatically low.
