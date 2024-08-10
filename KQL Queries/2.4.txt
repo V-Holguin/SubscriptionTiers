@@ -1,0 +1,75 @@
+// Find the top 5 items purchased by repeat customers
+Orders
+| extend NormalizedStatus = case(
+    ["Customer Status"] == "Silver" or ["Customer Status"] == "SILVER", "Silver",
+    ["Customer Status"] == "Gold" or ["Customer Status"] == "GOLD", "Gold",
+    ["Customer Status"] == "Platinum" or ["Customer Status"] == "PLATINUM", "Platinum",
+    "Unknown"  // default case
+)
+| summarize OrderCount = count() by ["Customer ID"], NormalizedStatus
+| where OrderCount > 2  // Filter for repeat customers
+| join kind=inner (Orders | project ["Customer ID"], ["Product ID"]) on ["Customer ID"]
+| summarize ProductCount = count() by NormalizedStatus, ["Product ID"]
+| partition by NormalizedStatus
+(
+    order by ProductCount desc
+    | top 5 by ProductCount
+)
+-------------------------------------------------------------------------------------------------------------------------------
+
+// Repeat earlier queries to find product names and counts for Silver
+.create table TopItemSilverOrders (
+    ["Product ID"]: long,
+    ["OrderCount"]: long
+)
+
+.append TopItemSilverOrders <|
+    table("Orders")
+    | where ["Customer Status"] == "Silver" or ["Customer Status"] == "SILVER"
+    | where ["Product ID"] in ("240100200014", "230100700002", "230100700011", "240100300006", "240100200012")
+    | summarize OrderCount = count() by ["Product ID"];
+
+
+Supplier
+| join kind=inner TopItemSilverOrders on ["Product ID"]
+
+// Small difference between normal and repeat customers.
+// We have Petanque Balls, 2 tents, 2 sets of darts with slightly different values which doesn't trend differently than before.
+-------------------------------------------------------------------------------------------------------------------------------
+
+// Gold
+.create table TopItemGoldOrders (
+    ["Product ID"]: long,
+    ["OrderCount"]: long
+)
+
+.append TopItemGoldOrders <|
+    table("Orders")
+    | where ["Customer Status"] == "Gold" or ["Customer Status"] == "GOLD"
+    | where ["Product ID"] in ("230100700011", "240100200014", "230100700002", "240100300006", "240100200012")
+    | summarize OrderCount = count() by ["Product ID"];
+
+Supplier
+| join kind=inner TopItemGoldOrders on ["Product ID"]
+
+// Same exact items as Silver, which means no meaningful difference from non repeat Gold members.
+-------------------------------------------------------------------------------------------------------------------------------
+
+// Platinum
+.create table TopItemPlatinumOrders (
+    ["Product ID"]: long,
+    ["OrderCount"]: long
+)
+
+.append TopItemPlatinumOrders <|
+    table("Orders")
+    | where ["Customer Status"] == "Platinum" or ["Customer Status"] == "PLATINUM"
+    | where ["Product ID"] in ("220100500026", "230100200004", "220100100541", "220101200014", "220200200018")
+    | summarize OrderCount = count() by ["Product ID"];
+
+Supplier
+| join kind=inner TopItemPlatinumOrders on ["Product ID"]
+
+// Complete shift from Sports items to Clothing items.
+// Tennis shoes followed by a women's polo, backpack, and another women's shirt.
+// Repeat Platinum members seem to shop for clothing, but again this is a tiny sample.
