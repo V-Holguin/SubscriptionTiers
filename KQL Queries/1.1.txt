@@ -9,11 +9,19 @@ Orders
     Null_QuantityOrdered = countif(isnull(["Quantity Ordered"])),
     Null_TotalRetailPrice = countif(isnull(["Total Retail Price for This Order"])),
     Null_CostPricePerUnit = countif(isnull(["Cost Price Per Unit"]))
+
+// Shows us 185,014 in DateOrderWasPlaced and exactly the same in DeliveryDate (which is our entire table, so we can delete those columns in PowerBI later) ... (maybe these are all in store purchases instead of delivery)
+// 1 in all other rows except Customer Status
 ------------------------------------------------------------------------------------------------------------------------
+
 // Check columns that had 1 NULL value
 Orders
 | where isnull(["Quantity Ordered"]) or isnull(["Total Retail Price for This Order"]) or isnull(["Cost Price Per Unit"])
+
+// Shows us that those are all on the same row, which is completely blank
+// Also shows an empty Customer Status which didn't appear on our count
 ------------------------------------------------------------------------------------------------------------------------
+
 // Refine original query to account for empty strings
 Orders
 | summarize 
@@ -26,11 +34,19 @@ Orders
      Null_TotalRetailPrice = countif(isnull(["Total Retail Price for This Order"])),
      Null_CostPricePerUnit = countif(isnull(["Cost Price Per Unit"])),
      Null_OrderID = countif(isnull(["Order ID"]))
+
+// Recheck our table for empty values
+// We still only have 1 row, but now it counted the Customer Status
+// This means we have 1 completely empty row, lets delete it when we get to PowerBI    
 ------------------------------------------------------------------------------------------------------------------------
+
 // Check for 0 where it shouldn't be
 Orders
 | where ["Quantity Ordered"] == 0 or ["Total Retail Price for This Order"] == 0 or ["Cost Price Per Unit"] == 0
+
+// Nothing returned
 ------------------------------------------------------------------------------------------------------------------------
+
 // Check duplicates
 Orders
 | summarize Count = count() by 
@@ -44,7 +60,10 @@ Orders
     TotalRetailPrice = ["Total Retail Price for This Order"],
     CostPricePerUnit = ["Cost Price Per Unit"]
 | where Count > 1;
+
+// Nothing returned
 ------------------------------------------------------------------------------------------------------------------------
+
 // Check outliers
 let stats = Orders
 | summarize 
@@ -56,4 +75,9 @@ Orders
 | extend Mean = MeanValue, StdDev = StdDevValue
 | extend IsOutlier = abs(["Quantity Ordered"] - Mean) > 2 * StdDev
 | where IsOutlier
+
+// Returned some normal values as low as 4, so lets move it to 3 standard deviations away
+// The values are still very normal being as low as 5, the mean is 1.67, so it must be heavily weighted around the mean
+// Outside of 3 standard deviations, we are only looking at 0.3% of the data, but lets keep going
+// Outside of 8 standard deviations, we get our top 3 purchases of 9,9 and 10 quantity, which isn't that unrealistic and in an extremely small percentage of the data, so we can ignore these
 ------------------------------------------------------------------------------------------------------------------------
